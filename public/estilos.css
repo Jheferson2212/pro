@@ -57,7 +57,7 @@ h4 {
 
 input.field2.medium,
 select.field2.medium {
-    width: calc(50% - 40px);
+    width: calc(50% - 40px); /* Reducir ancho a la mitad */
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ddd;
