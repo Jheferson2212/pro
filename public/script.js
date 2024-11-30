@@ -4,6 +4,29 @@ document.addEventListener("DOMContentLoaded", function() {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 
+    // Función para actualizar las cotizaciones
+    function actualizarCotizaciones() {
+        const url = '/ruta/a/tu/api/de/cotizaciones';  // URL de tu API
+        const noCacheUrl = `${url}?t=${new Date().getTime()}`;  // Agregar parámetro de tiempo único
+
+        fetch(noCacheUrl)
+            .then(response => response.json())
+            .then(data => {
+                const selectedOption = document.getElementById("fieldname3_3").options[document.getElementById("fieldname3_3").selectedIndex].text;
+                let tipoCambio = 0;
+                
+                if (selectedOption.includes("Colombia ► Argentina")) {
+                    tipoCambio = data.cotizacion_CO_AR; // Suponiendo que la API devuelve esta cotización
+                } else if (selectedOption.includes("Argentina ► Colombia")) {
+                    tipoCambio = data.cotizacion_AR_CO; // Suponiendo que la API devuelve esta cotización
+                }
+                
+                document.getElementById("fieldname3_3").value = tipoCambio;
+                calcularDineroRecibir();
+            })
+            .catch(error => console.error('Error al obtener las cotizaciones:', error));
+    }
+
     // Función para calcular el dinero a recibir
     function calcularDineroRecibir() {
         let montoEnviar = parseFloat(document.getElementById("fieldname2_3").value.replace(/\./g, '').replace(',', '.'));
@@ -47,20 +70,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // Llamar a la función calcularDineroRecibir al cargar la página
     calcularDineroRecibir();
 
-    // Añadir un parámetro de tiempo único para evitar el caché de los datos
-    function obtenerCotizaciones() {
-        const url = '/ruta/a/tu/api/de/cotizaciones';  // URL de tu API
-        const noCacheUrl = `${url}?t=${new Date().getTime()}`;
-
-        fetch(noCacheUrl)
-            .then(response => response.json())
-            .then(data => {
-                // Actualizar la información en la página
-                document.getElementById("fieldname6_3").value = formatNumberWithCommas(data.cotizacion); // Ajustar según el formato de tu API
-            })
-            .catch(error => console.error('Error al obtener las cotizaciones:', error));
-    }
-
-    // Actualizar las cotizaciones cada cierto tiempo
-    setInterval(obtenerCotizaciones, 60000); // Actualiza cada 60 segundos
+    // Llamar a la función actualizarCotizaciones para obtener los datos más recientes
+    actualizarCotizaciones();
+    
+    // Actualizar las cotizaciones cada 60 segundos
+    setInterval(actualizarCotizaciones, 60000); // Actualiza cada 60 segundos
 });
