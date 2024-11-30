@@ -1,48 +1,66 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario de Envío de Dinero 2</title>
-    <link rel="stylesheet" href="estilos.css">
-</head>
-<body>
-    <section class="elementor-section elementor-top-section elementor-element elementor-element-6127544e elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="6127544e" data-element_type="section">
-        <div class="elementor-container elementor-column-gap-default">
-            <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-4f884b2d" data-id="4f884b2d" data-element_type="column">
-                <div class="elementor-widget-wrap elementor-element-populated">
-                    <div class="elementor-element elementor-element-36d0b13c elementor-widget elementor-widget-text-editor" data-id="36d0b13c" data-element_type="widget" data-widget_type="text-editor.default">
-                        <div class="elementor-widget-container">
-                            <form name="cp_calculatedfieldsf_pform_3" id="cp_calculatedfieldsf_pform_3" action="?" method="post" enctype="multipart/form-data" class="cff-form cp_cff_15" dir="ltr" novalidate="novalidate" data-evalequations="1" data-evalequationsevent="2" data-animate_form="0" data-animation_effect="fade" autocomplete="on">
-                                <input type="hidden" name="cp_calculatedfieldsf_pform_psequence" value="_3">
-                                <input type="hidden" name="cp_calculatedfieldsf_id" value="12">
-                                <div class="fields fieldname3_3 cff-dropdown-field" id="field_3-0">
-                                    <label for="fieldname3_3" class="bold">Elige los países deseados.</label>
-                                    <div class="dfield">
-                                        <select aria-label="Elige los países deseados." id="fieldname3_3" name="fieldname3_3" class="field2 medium">
-                                            <option value="0.240">🇨🇴 Colombia ► Argentina 🇦🇷</option>
-                                            <option value="3.60">🇦🇷 Argentina ► Colombia 🇨🇴</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="fields fieldname2_3 cff-number-field" id="field_3-1">
-                                    <label for="fieldname2_3" class="bold">Dinero a Enviar</label>
-                                    <div class="dfield">
-                                        <div class="input-group">
-                                            <input inputmode="decimal" aria-label="Dinero a Enviar" id="fieldname2_3" name="fieldname2_3" min="0" max="30000000" step="1" class="field2 number small required medium" type="text" value="">
-                                            <span id="moneda_enviar_3" class="currency">COP</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="fields fieldname8_3 cff-calculated-field" id="field_3-2">
-                                    <label for="fieldname8_3" class="bold">Comisión de Parcero Envíos.</label>
-                                    <div class="dfield">
-                                        <input aria-label="Comisión de Parcero Envíos." id="fieldname8_3" name="fieldname8_3" readonly="" class="codepeoplecalculatedfield field2 medium" type="text" value="$ 0" placeholder="$ 0">
-                                    </div>
-                                </div>
-                                <div class="fields fieldname6_3 cff-calculated-field" id="field_3-3">
-                                    <label for="fieldname6_3" class="bold">Dinero a recibir.</label>
-                                    <div class="dfield">
-                                        <div class="input-group">
-                                            <input aria-label="Dinero a recibir." id="fieldname6_3" name="fieldname6_3" readonly="" class="codepeoplecalculatedfield field2 medium" type="text" value="">
-[_{{{CITATION{{{_1{](https://github.com/la9una/web/tree/ba1073ae044ebb7b538a3b13f0f9598f7c410bb6/docs%2Fbootstrap%2Falignci.md)
+document.addEventListener("DOMContentLoaded", function() {
+    // Función para formatear un número con punto de miles
+    function formatNumberWithCommas(number) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    // Función para calcular el dinero a recibir
+    function calcularDineroRecibir() {
+        let montoEnviar = parseFloat(document.getElementById("fieldname2_3").value.replace(/\./g, '').replace(',', '.'));
+        let tipoCambio = parseFloat(document.getElementById("fieldname3_3").value);
+        const selectedOption = document.getElementById("fieldname3_3").options[document.getElementById("fieldname3_3").selectedIndex].text;
+
+        let monedaEnviar = "";
+        let monedaRecibir = "";
+
+        if (isNaN(montoEnviar)) {
+            montoEnviar = 0; // Establecer monto a 0 si es NaN
+        }
+
+        if (selectedOption.includes("Colombia ► Argentina")) {
+            monedaEnviar = "COP";
+            monedaRecibir = "ARS";
+        } else if (selectedOption.includes("Argentina ► Colombia")) {
+            monedaEnviar = "ARS";
+            monedaRecibir = "COP";
+        }
+
+        const dineroRecibir = Math.round(montoEnviar * tipoCambio);
+        document.getElementById("fieldname2_3").value = formatNumberWithCommas(montoEnviar);
+        document.getElementById("moneda_enviar_3").textContent = monedaEnviar;
+        document.getElementById("fieldname6_3").value = formatNumberWithCommas(dineroRecibir); // Redondear a número entero
+        document.getElementById("moneda_recibir_3").textContent = monedaRecibir;
+    }
+
+    // Evento input para el campo "Dinero a Enviar"
+    document.getElementById("fieldname2_3").addEventListener("input", function() {
+        if (this.value === "") {
+            this.value = "0"; // Establecer el valor a 0 si está vacío
+        }
+        this.value = formatNumberWithCommas(parseFloat(this.value.replace(/\./g, '').replace(',', '.'))) || "";
+        calcularDineroRecibir();
+    });
+
+    // Evento change para el campo "Tipo de cambio"
+    document.getElementById("fieldname3_3").addEventListener("change", calcularDineroRecibir);
+
+    // Llamar a la función calcularDineroRecibir al cargar la página
+    calcularDineroRecibir();
+
+    // Añadir un parámetro de tiempo único para evitar el caché de los datos
+    function obtenerCotizaciones() {
+        const url = '/ruta/a/tu/api/de/cotizaciones';  // URL de tu API
+        const noCacheUrl = `${url}?t=${new Date().getTime()}`;
+
+        fetch(noCacheUrl)
+            .then(response => response.json())
+            .then(data => {
+                // Actualizar la información en la página
+                document.getElementById("fieldname6_3").value = formatNumberWithCommas(data.cotizacion); // Ajustar según el formato de tu API
+            })
+            .catch(error => console.error('Error al obtener las cotizaciones:', error));
+    }
+
+    // Actualizar las cotizaciones cada cierto tiempo
+    setInterval(obtenerCotizaciones, 60000); // Actualiza cada 60 segundos
+});
