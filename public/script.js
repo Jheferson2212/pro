@@ -46,4 +46,21 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Llamar a la función calcularDineroRecibir al cargar la página
     calcularDineroRecibir();
+
+    // Añadir un parámetro de tiempo único para evitar el caché de los datos
+    function obtenerCotizaciones() {
+        const url = '/ruta/a/tu/api/de/cotizaciones';  // URL de tu API
+        const noCacheUrl = `${url}?t=${new Date().getTime()}`;
+
+        fetch(noCacheUrl)
+            .then(response => response.json())
+            .then(data => {
+                // Actualizar la información en la página
+                document.getElementById("fieldname6_3").value = formatNumberWithCommas(data.cotizacion); // Ajustar según el formato de tu API
+            })
+            .catch(error => console.error('Error al obtener las cotizaciones:', error));
+    }
+
+    // Actualizar las cotizaciones cada cierto tiempo
+    setInterval(obtenerCotizaciones, 60000); // Actualiza cada 60 segundos
 });
